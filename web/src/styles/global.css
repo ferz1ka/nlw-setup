@@ -4,6 +4,45 @@
 
 *::-webkit-scrollbar {
   display: none;
-  -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+.tooltip {
+  position: relative;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  min-width: 320px;
+  background-color: #18181b;
+  border-radius: 1rem;
+  padding: 24px;
+
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+}
+
+.tooltip .tooltiptext {
+  min-width: 320px;
+  top: 135%;
+  left: 50%;
+  transform: translateX(-50%);
+  /* Use half of the width (120/2 = 60), to center the tooltip */
+}
+
+.tooltip .tooltiptext::after {
+  content: " ";
+  position: absolute;
+  bottom: 100%;
+  /* At the bottom of the tooltip */
+  left: 50%;
+  margin-left: -8px;
+  border-width: 8px;
+  border-style: solid;
+  border-color: transparent transparent #18181b transparent;
 }
