@@ -1,5 +1,5 @@
-import { Text, View, ScrollView } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useEffect, useState } from "react";
+import { Text, View, ScrollView, Alert } from "react-native";
 
 // Components
 import { HabitTableItem, HABIT_TABLE_ITEM_SIZE } from "../components/HabitTableItem";
@@ -7,15 +7,41 @@ import { Header } from "../components/Header";
 
 // Utils
 import { daysInYear, generateDatesSinceFirstDayOfTheYear } from '../utils/generate-date-range'
+
+// Services
+import { api } from "../services/axios";
+
 const today = new Date()
 const weekDays = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S']
 const habitTableDates = generateDatesSinceFirstDayOfTheYear()
 const minimumHabitTableDates = daysInYear(today.getFullYear())
 const habitTableDatesToFill = [...Array(minimumHabitTableDates - habitTableDates.length)]
 
+type Summary = {
+  id: string
+  date: string
+  amount: number
+  completed: number
+}[]
+
 export function Home() {
 
-  const { navigate } = useNavigation()
+  const [summary, setSummary] = useState<Summary>([])
+
+  console.log('summary', summary)
+
+  async function fetchSummaryData() {
+    try {
+      const res = await api.get('summary')
+      setSummary(res.data)
+    } catch (error) {
+      console.log('Erro na busca dos hábitos.. :(')
+    }
+  }
+
+  useEffect(() => {
+    fetchSummaryData()
+  }, [])
 
   return (
     <View className="flex-1 bg-background px-8 pt-16">
@@ -41,12 +67,17 @@ export function Home() {
       >
         <View className="flex-row flex-wrap">
           {
-            habitTableDates.map(date => (
-              <HabitTableItem
-                key={date.toISOString()}
-                onPress={() => navigate('habit', { date: date.toISOString() })}
-              />
-            ))
+            habitTableDates.map(date => {
+              const isSummaryDay = summary.find(day => new Date(day.date).getTime() === new Date(date).getTime())
+              return (
+                <HabitTableItem
+                  key={date.toISOString()}
+                  date={date}
+                  amount={isSummaryDay?.amount}
+                  completed={isSummaryDay?.completed}
+                />
+              )
+            })
           }
           {
             habitTableDatesToFill.map((_, index) => (

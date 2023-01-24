@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { ScrollView, View, Text, TextInput, TouchableOpacity } from "react-native";
+import { ScrollView, View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
 
 import { Feather } from '@expo/vector-icons'
 
 import { BackButton } from "../components/BackButton";
 import { CheckBox } from "../components/CheckBox";
 import colors from "tailwindcss/colors";
+import { api } from "../services/axios";
 
 const weekDaysLabel = [
   'Domingo',
@@ -17,15 +18,51 @@ const weekDaysLabel = [
   'Sábado',
 ]
 
+type FormDataType = {
+  title: string
+  weekDays: number[]
+}
+
 export function NewHabit() {
 
-  const [selectedWeekDays, setSelectedWeekDays] = useState<number[]>([])
+  const [formData, setFormData] = useState<FormDataType>({
+    title: '',
+    weekDays: []
+  })
 
-  function handleToggleWeekDay(index: number) {
-    if (selectedWeekDays.includes(index)) {
-      setSelectedWeekDays(prevState => prevState.filter(dayIdx => dayIdx !== index))
+  async function handleSubmit() {
+    try {
+
+      console.log(formData)
+      if (!formData.title || formData.weekDays.length === 0) return Alert.alert('Informe todos os dados corretamente.')
+      await api.post('habits', formData)
+
+      setFormData({
+        title: '',
+        weekDays: []
+      })
+
+      Alert.alert('Hábito criado com sucesso!')
+    } catch (error) {
+      Alert.alert('Falha na criação do hábito.. :(')
+    }
+  }
+
+  function handleToggleWeekDays(weekDayIndex: number) {
+    if (formData?.weekDays?.includes(weekDayIndex)) {
+      setFormData(prevState => (
+        {
+          ...prevState,
+          weekDays: prevState.weekDays.filter(weekDayNumber => weekDayNumber !== weekDayIndex)
+        }
+      ))
     } else {
-      setSelectedWeekDays(prevState => [...prevState, index])
+      setFormData(prevState => (
+        {
+          ...prevState,
+          weekDays: [...prevState.weekDays, weekDayIndex]
+        }
+      ))
     }
   }
 
@@ -50,6 +87,8 @@ export function NewHabit() {
           className="h-12 pl-4 rounded-lg mt-3 bg-zinc-900 border-2 border-zinc-800 text-white focus:border-green-600"
           placeholder="Ex.: Exercícios, dormir bem, etc..."
           placeholderTextColor={colors.zinc[400]}
+          value={formData.title}
+          onChangeText={text => setFormData(prevState => ({ ...prevState, title: text }))}
         />
 
         <Text className="mt-6 mb-3 text-white font-semibold text-base">
@@ -62,8 +101,8 @@ export function NewHabit() {
               <CheckBox
                 key={day}
                 label={day}
-                checked={selectedWeekDays.includes(index)}
-                onPress={() => handleToggleWeekDay(index)}
+                checked={formData.weekDays.includes(index)}
+                onPress={() => handleToggleWeekDays(index)}
               />
             ))
           }
@@ -72,6 +111,7 @@ export function NewHabit() {
         <TouchableOpacity
           activeOpacity={0.7}
           className='mt-6 w-full h-14 bg-green-500 rounded-lg flex-row justify-center items-center'
+          onPress={handleSubmit}
         >
           <Feather
             name="check"

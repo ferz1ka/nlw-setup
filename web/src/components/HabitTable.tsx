@@ -1,4 +1,5 @@
 import { createRef, useEffect, useState, } from "react"
+import { api } from "../services/axios"
 import { daysInYear, generateDatesSinceFirstDayOfTheYear, generateAllDatesOfTheYear } from "../utils/generate-date-range"
 import { HabitTableIndicator } from "./HabitTableIndicator"
 import { HabitTableItem } from "./HabitTableItem"
@@ -9,6 +10,14 @@ const habitTableDates = generateAllDatesOfTheYear()
 const today = new Date()
 const minimumHabitTableDates = daysInYear(today.getFullYear())
 const HabitTableDatesToFill = [...Array(minimumHabitTableDates - habitTableDates.length)]
+const habitTableDatesToShow = [...habitTableDates, ...HabitTableDatesToFill]
+
+type Summary = {
+  id: string
+  date: string
+  amount: number
+  completed: number
+}[]
 
 export function HabitTable() {
   const target = createRef<HTMLDivElement>();
@@ -17,7 +26,11 @@ export function HabitTable() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const currentPage = (scrollProgress * pages) / 100;
 
-  const habitTableDatesToShow = [...habitTableDates, ...HabitTableDatesToFill]
+  const [summary, setSummary] = useState<Summary>([])
+
+  useEffect(() => {
+    api.get('summary').then(res => setSummary(res.data))
+  }, [])
 
   useEffect(() => {
     if (target?.current) target?.current?.addEventListener('scroll', scrollListener);
@@ -49,15 +62,19 @@ export function HabitTable() {
           ))}
         </div>
         <div ref={target} className="flex-1 grid grid-rows-7 grid-flow-col gap-3 overflow-x-scroll snap-x snap-mandatory scroll-smooth">
-          {habitTableDatesToShow.map((date, index) => (
-            <HabitTableItem
-              key={index}
-              amount={5}
-              completed={Math.round(Math.random() * 5)}
-              snap={index % 126 == 0}
-              disabled={date.getTime() > today.getTime()}
-            />
-          ))}
+          {habitTableDatesToShow.map((date, index) => {
+            const isSummaryDay = summary.find(day => new Date(day.date).getTime() === new Date(date).getTime())
+            return (
+              <HabitTableItem
+                key={index}
+                date={date}
+                amount={isSummaryDay?.amount}
+                completed={isSummaryDay?.completed}
+                snap={index % 126 == 0}
+                disabled={date.getTime() > today.getTime()}
+              />
+            )
+          })}
         </div>
       </div>
       <div className="flex gap-3">

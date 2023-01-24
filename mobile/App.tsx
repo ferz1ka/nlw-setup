@@ -2,12 +2,11 @@ import { StatusBar, View } from 'react-native';
 import { useFonts, Inter_400Regular, Inter_600SemiBold, Inter_700Bold, Inter_800ExtraBold } from '@expo-google-fonts/inter'
 import './src/utils/dayjs'
 
-// Screens
-import { Home } from './src/screens/Home';
+// Routes
+import { AppRoutes } from './src/routes/app.routes';
 
 // Components
 import { Loading } from './src/components/Loading';
-import { AppRoutes } from './src/routes/app.routes';
 
 export default function App() {
 

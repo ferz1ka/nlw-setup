@@ -7,21 +7,21 @@ export async function Router(app: FastifyInstance) {
 
     const createHabitBody = z.object({
       title: z.string(),
-      habitWeekDays: z.array(
+      weekDays: z.array(
         z.number().min(0).max(6)
       )
     })
 
-    const { title, habitWeekDays } = createHabitBody.parse(req.body)
+    const { title, weekDays } = createHabitBody.parse(req.body)
 
-    const today = new Date(new Date().setUTCHours(0, 0, 0, 0))
+    const today = new Date(new Date().setHours(0, 0, 0, 0))
 
     await prisma.habit.create({
       data: {
         title,
         created_at: today,
         habitWeekDays: {
-          create: habitWeekDays.map(weekDay => {
+          create: weekDays.map(weekDay => {
             return {
               week_day: weekDay
             }
@@ -76,7 +76,7 @@ export async function Router(app: FastifyInstance) {
 
     const { id } = toggleHabitParams.parse(req.params)
 
-    const today = new Date(new Date().setUTCHours(0, 0, 0, 0))
+    const today = new Date(new Date().setHours(0, 0, 0, 0))
 
     let day = await prisma.day.findUnique({
       where: {
@@ -119,7 +119,7 @@ export async function Router(app: FastifyInstance) {
     }
   })
 
-  app.get('/summary', async (req) => {
+  app.get('/summary', async () => {
     // Atenção: Essa query RAW a seguir pode funcionar somente no SQLite!
     const summary = await prisma.$queryRaw`
       SELECT 
