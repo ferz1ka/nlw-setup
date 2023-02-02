@@ -55,21 +55,21 @@ export function HabitTable() {
 
   return (
     <div className="flex flex-col justify-center items-center gap-7">
-      <div className="w-full flex gap-1">
+      <div className="w-full flex">
         <div className="grid grid-rows-7 gap-3">
           {weekDaysLabel.map((weekDayLabel, index) => (
             <div key={index} className="text-zinc-400 text-xl h-10 w-10 font-bold flex justify-center items-center">{weekDayLabel}</div>
           ))}
         </div>
         <div ref={target} className="flex-1 grid grid-rows-7 grid-flow-col gap-3 overflow-x-scroll snap-x snap-mandatory scroll-smooth">
-          {habitTableDatesToShow.map((date, index) => {
+          {summary.length > 0 && habitTableDatesToShow.map((date, index) => {
             const isSummaryDay = summary.find(day => new Date(day.date).getTime() === new Date(date).getTime())
             return (
               <HabitTableItem
                 key={index}
                 date={date}
                 amount={isSummaryDay?.amount}
-                completed={isSummaryDay?.completed}
+                defaultCompleted={isSummaryDay?.completed}
                 snap={index % 126 == 0}
                 disabled={date.getTime() > today.getTime()}
               />

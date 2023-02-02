@@ -33,8 +33,8 @@ export function NewHabit() {
   async function handleSubmit() {
     try {
 
-      console.log(formData)
-      if (!formData.title || formData.weekDays.length === 0) return Alert.alert('Informe todos os dados corretamente.')
+      if (!formData.title.trim() || formData.weekDays.length === 0) return Alert.alert('Informe todos os dados corretamente.')
+
       await api.post('habits', formData)
 
       setFormData({

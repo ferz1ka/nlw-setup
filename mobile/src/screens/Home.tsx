@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Text, View, ScrollView, Alert } from "react-native";
+import { useCallback, useState } from "react";
+import { Text, View, ScrollView } from "react-native";
 
 // Components
 import { HabitTableItem, HABIT_TABLE_ITEM_SIZE } from "../components/HabitTableItem";
@@ -10,6 +10,8 @@ import { daysInYear, generateDatesSinceFirstDayOfTheYear } from '../utils/genera
 
 // Services
 import { api } from "../services/axios";
+import { Loading } from "../components/Loading";
+import { useFocusEffect } from "@react-navigation/native";
 
 const today = new Date()
 const weekDays = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S']
@@ -27,21 +29,25 @@ type Summary = {
 export function Home() {
 
   const [summary, setSummary] = useState<Summary>([])
-
-  console.log('summary', summary)
+  const [loading, setLoading] = useState(true)
 
   async function fetchSummaryData() {
     try {
+      setLoading(true)
       const res = await api.get('summary')
       setSummary(res.data)
     } catch (error) {
       console.log('Erro na busca dos hábitos.. :(')
+    } finally {
+      setLoading(false)
     }
   }
 
-  useEffect(() => {
+  useFocusEffect(useCallback(() => {
     fetchSummaryData()
-  }, [])
+  }, []))
+
+  if (loading) return <Loading />
 
   return (
     <View className="flex-1 bg-background px-8 pt-16">

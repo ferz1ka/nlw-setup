@@ -37,7 +37,7 @@ export async function Router(app: FastifyInstance) {
     })
 
     const { date } = getDayParams.parse(req.query)
-    const weekDay = date.getUTCDay()
+    const weekDay = date.getDay()
 
     const allHabits = await prisma.habit.findMany({
       where: {
@@ -61,7 +61,7 @@ export async function Router(app: FastifyInstance) {
       }
     })
 
-    const completedHabits = day?.dayHabits.map(dayHabit => dayHabit.habit_id)
+    const completedHabits = day?.dayHabits.map(dayHabit => dayHabit.habit_id) || []
 
     return {
       allHabits,

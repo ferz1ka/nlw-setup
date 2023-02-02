@@ -64,7 +64,7 @@ export function NewHabitForm() {
         type="text"
         id="title"
         placeholder="Ex.: Exercícios, dormir bem, etc..."
-        className="p-4 rounded-lg mt-3 bg-zinc-800 text-white placeholder:text-zinc-400"
+        className="p-4 rounded-lg mt-3 bg-zinc-800 text-white placeholder:text-zinc-500 focus:outline-none"
         value={formData.title}
         onChange={event => setFormData(prevState => ({ ...prevState, title: event.target.value }))}
       />
@@ -88,7 +88,7 @@ export function NewHabitForm() {
 
       <button
         type="submit"
-        className="mt-6 p-4 rounded-lg flex items-center justify-center gap-3 font-semibold bg-green-600 hover:bg-green-500"
+        className="mt-6 p-4 rounded-lg flex items-center justify-center gap-3 font-semibold transition-colors bg-green-600 hover:bg-green-500"
       >
         <Check size={20} weight="bold" />
         Confirmar
